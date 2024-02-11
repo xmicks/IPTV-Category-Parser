@@ -71,6 +71,8 @@ def search_categories(input_or_url, keywords):
     if input_file != input_or_url:
         os.remove(input_file)
 
+
+
 # Function to parse an M3U file, optionally downloading it first, and filter by categories.
 def parse_m3u(input_or_url, output_file, config_file):
     input_file = input_or_url
@@ -91,9 +93,11 @@ def parse_m3u(input_or_url, output_file, config_file):
         outfile.write('#EXTM3U\n')  # Ensure the M3U file starts with the EXTINF header
         copy_next_line = False
         for line in infile:
-            if line.startswith('#EXTINF') and any(re.search('group-title="([^"]+)"', line).group(1) in categories):
-                outfile.write(line)
-                copy_next_line = True  # Next line is the stream URL
+            if line.startswith('#EXTINF'):
+                match = re.search('group-title="([^"]+)"', line)
+                if match and match.group(1) in categories:
+                    outfile.write(line)
+                    copy_next_line = True  # Next line is the stream URL
             elif copy_next_line:
                 outfile.write(line)  # Write the stream URL
                 copy_next_line = False  # Reset for the next entry
